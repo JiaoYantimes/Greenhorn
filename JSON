@@ -1,0 +1,35 @@
+public String getbuildingJsonYzname(ActionMapping mapping, ActionForm form,
+HttpServletRequest request, HttpServletResponse response) {
+response.setContentType("textml; charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+String identifyNo = request.getParameter("identifyNo");
+try {
+PrintWriter pw = null;
+List list = new ArrayList();
+List<SpShangpu> pageList = null;
+pageList = this.spShangpuService.findByidentifyNo(identifyNo); //获得sp列表
+JSONArray json = null;
+for (SpShangpu temp : pageList) {
+  Map map = new HashMap();
+    SpBuilding spBuilding = this.spBuildingService.findById(temp.getBuildingid()); //循环内重新定义 通过sp获得buding对象
+    SpBuilding spBuilding1 = this.spBuildingService.findById(spBuilding.getPid());//循环内重新定义 通过buding.pid获得小区的buding对象
+    map.put("louhao", spBuilding.getBuildingname());
+    map.put("xiaoqu", spBuilding1.getBuildingname());
+    map.put("shopno", temp.getShopno());
+    map.put("shopname", temp.getShopname());
+    map.put("mobile", temp.getMobile());
+  list.add(map);
+}
+
+json = json.fromObject(list);
+JSONObject c = new JSONObject();
+c.put("jsons", json);
+pw = response.getWriter();
+pw.print(c.toString());
+log.info("返回Json序列化的数据=" + c.toString());
+  return null;
+} catch (Exception e) {
+e.printStackTrace();
+}
+  return null;
+}
